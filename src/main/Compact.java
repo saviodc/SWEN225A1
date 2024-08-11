@@ -34,6 +34,7 @@ class Compact extends JFrame{
      };
     add(BorderLayout.CENTER, welcome);
     add(BorderLayout.SOUTH, start);
+    
     start.addActionListener(e->phaseOne());
     setPreferredSize(new Dimension(800, 400));
     pack();
@@ -59,4 +60,21 @@ class Compact extends JFrame{
     v.requestFocus();//need to be after pack
     timer.start();
   }
+}
+
+/**
+ * Class for key binding setter by button
+ * On-click prompts a JOption pane
+ */
+class KeyButton extends JButton{
+	KeyButton(String key, JFrame frame){
+		super(key, null);
+		this.addActionListener(e->{
+			
+		});
+	}
+	
+	
+	
+	
 }
