@@ -6,14 +6,15 @@ import imgs.Img;
 
 class MonsterException extends Error{
 	private static final long serialVersionUID = 1L;
-	public MonsterException(String s) {
+	public MonsterException() {
         super("Dead Monster");
     }
 }
 interface MonsterState{
-	 Point location();
-	 //default double speed() {}
-	 default void location(Point p, Monster m) {}
+	 default Point location(Monster mon) {
+		 return mon.location();
+	 }
+	 
 	 void ping(Model m, Monster mon);
 	 double chaseTarget(Monster outer, Point target, Monster mon);
 	 void draw(Graphics g, Point center, Dimension size, Monster mon);
@@ -26,6 +27,7 @@ enum MonsterStates implements MonsterState{
 			arrow = arrow.times(mon.speed() / size);
 			mon.location(mon.location().add(arrow));
 			if (size < 0.6d) {
+				mon.state = Dead;
 				m.onGameOver();
 			}
 		}
@@ -39,61 +41,65 @@ enum MonsterStates implements MonsterState{
 		public void draw(Graphics g, Point center, Dimension size, Monster mon) {
 			mon.drawImg(Img.AwakeMonster.image, g, center, size);
 		}
+		
 	},
-	Dead,
-	Sleep;
+	Dead(){
+		public void ping(Model m, Monster mon) {
+			throw new MonsterException();
+		}
+		public  double chaseTarget(Monster outer, Point target, Monster mon) {
+			 throw new MonsterException();
+		 }
+		public  void draw(Graphics g, Point center, Dimension size, Monster mon) {
+			 mon.drawImg(Img.DeadMonster.image, g, center, size);
+		 }
+		
+	},
+	Sleep(){
+		public void ping(Model m, Monster mon) {
+			var arrow = m.camera().location().distance(mon.location());
+			double size = arrow.size();
+			if(size <6d)mon.state = Awake;
+		}
+		public  double chaseTarget(Monster outer, Point target, Monster mon) {
+			 return 0;
+		 }
+		public  void draw(Graphics g, Point center, Dimension size, Monster mon) {
+			 mon.drawImg(Img.SleepMonster.image, g, center, size);
+		 }
+		
+	};
 }
-//record AwakeMonster() implements MonsterState{}
-//record DeadMonster() implements MonsterState{}
-//record SleepMonster() implements MonsterState{}
-
 
 class Monster implements Entity {
 	 
-	MonsterStates state = MonsterState.Sleep;
+	MonsterStates state = MonsterStates.Sleep;
 	private Point location;
 	Monster(Point location) {
 		this.location = location;
 	}
 
 	public double speed() {
-	
-
-	public Point location() {
+		return 0.05d;
+	}
+	public Point location(){
 		return location;
 	}
 
 	public void location(Point p) {
-		location = p;
+		location=p;
 	}
 
-		return 0.05d;
-	}
 
 	public void ping(Model m) {
-		var arrow = m.camera().location().distance(location);
-		double size = arrow.size();
-		arrow = arrow.times(speed() / size);
-		location = location.add(arrow);
-		if (size < 0.6d) {
-			m.onGameOver();
-		}
+		state.ping(m, this);
 	}
 
 	public double chaseTarget(Monster outer, Point target) {
-		var arrow = target.distance(outer.location());
-		double size = arrow.size();
-		arrow = arrow.times(speed() / size);
-		outer.location(outer.location().add(arrow));
-		return size;
+		return state.chaseTarget(outer, target, this);
 	}
 
 	public void draw(Graphics g, Point center, Dimension size) {
-		drawImg(Img.AwakeMonster.image, g, center, size);
+		state.draw(g, center, size, this);
 	}
-
-
-
-
-
 }
