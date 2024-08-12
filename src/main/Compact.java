@@ -121,7 +121,7 @@ class KeyBindDisplay extends JPanel{
 				key.setText(key.act + ": " +newKey);
 				var cur = KeyButton.frame.currentPhase.controller();
 				//issue updating key bind
-				cur.setAction(KeyEvent.getExtendedKeyCodeForChar(newKey.charAt(0)),KeyButton.frame.currentPhase.model().camera().set((Direction::up)) , KeyButton.frame.currentPhase.model().camera().set((Direction::unUp)));
+				//cur.setAction(KeyEvent.getExtendedKeyCodeForChar(newKey.charAt(0)),KeyButton.frame.currentPhase.model().camera().set((Direction::up)) , KeyButton.frame.currentPhase.model().camera().set((Direction::unUp)));
 			});
 			this.add(key);
 		});
