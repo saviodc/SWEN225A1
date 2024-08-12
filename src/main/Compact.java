@@ -13,6 +13,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
@@ -49,7 +50,18 @@ class Compact extends JFrame{
     pack();
   }
   
- 
+  private void phaseEnd() {
+	  var message = new JLabel("Congratulations");
+	  var close = new JButton("Close");
+	  close.addActionListener(e->this.dispose());
+	  closePhase.run();
+	  close.setMaximumSize(new Dimension(10,10));
+	  message.setHorizontalAlignment(SwingConstants.CENTER);
+	  add(BorderLayout.CENTER, message);
+	  add(BorderLayout.SOUTH, close);
+	  pack();
+	  
+  }
   private void phaseOne(){
     setPhase(Phase.level1(()->phaseTwo(), ()->phaseZero()));
   }
@@ -57,7 +69,7 @@ class Compact extends JFrame{
 	  setPhase(Phase.level2(()->phaseThree(), ()->phaseZero()));
   }
   private void phaseThree() {
-	  setPhase(Phase.level3(()->phaseZero(), ()->phaseZero()));
+	  setPhase(Phase.level3(()->phaseZero(), ()->phaseEnd()));
   }
   void setPhase(Phase p){
     //set up the viewport and the timer
