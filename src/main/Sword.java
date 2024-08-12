@@ -21,9 +21,11 @@ class Sword extends ControllableDirection implements Entity{
   public double effectRange(){ return 0.3d; }
   
   public void ping(Model m){
+	  
     weaponRadiant += direction().arrow(speed()).x();
     weaponRadiant %= Math.PI * 2d;
     var l= this.location();
+    
     m.entities().stream()
       .filter(e->e != this)
       .filter(e->e.location().distance(l).size() < effectRange())

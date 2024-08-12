@@ -3,11 +3,9 @@ package main;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
-import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -50,8 +48,16 @@ class Compact extends JFrame{
     setPreferredSize(new Dimension(800, 400));
     pack();
   }
+  
+ 
   private void phaseOne(){
-    setPhase(Phase.level1(()->phaseOne(), ()->phaseZero()));
+    setPhase(Phase.level1(()->phaseTwo(), ()->phaseZero()));
+  }
+  private void phaseTwo() {
+	  setPhase(Phase.level2(()->phaseThree(), ()->phaseZero()));
+  }
+  private void phaseThree() {
+	  setPhase(Phase.level3(()->phaseZero(), ()->phaseZero()));
   }
   void setPhase(Phase p){
     //set up the viewport and the timer
