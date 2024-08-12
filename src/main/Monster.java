@@ -2,7 +2,6 @@ package main;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.desktop.ScreenSleepEvent;
 
 import imgs.Img;
 
@@ -10,6 +9,9 @@ class MonsterException extends Error{
 	private static final long serialVersionUID = 1L;
 	public MonsterException() {
         super("Dead Monster");
+    }
+	public MonsterException(String message) {
+        super(message);
     }
 }
 interface MonsterState{
@@ -72,7 +74,7 @@ enum MonsterStates implements MonsterState{
 		 }
 		
 	}, 
-Roaming(){
+	Roaming(){
 		Point goal = new Point(Math.random()*16, Math.random()*16);
 		int progress = 0;
 		public void ping(Model m, Monster mon) {
@@ -99,7 +101,7 @@ Roaming(){
 		}
 		
 	}, 
-Boss(){
+	Boss(){
 		Sword sword;
 		public void ping(Model m, Monster mon) {
 			var arrow = m.camera().location().distance(mon.location());
@@ -120,7 +122,7 @@ Boss(){
 			outer.location(outer.location().add(arrow));
 			return size;
 		}
-		
+		@Override
 		public void assignSword(Monster m) {
 			assert m.state==this;
 			sword = new Sword(m) {
@@ -142,7 +144,7 @@ Boss(){
 	}
 	};
 
-	void assignSword(Monster monster) {}
+	void assignSword(Monster monster) {throw new MonsterException("This Monster cannot weild sword");}
 
 }
 

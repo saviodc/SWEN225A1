@@ -69,7 +69,7 @@ class Compact extends JFrame{
 	  setPhase(Phase.level2(()->phaseThree(), ()->phaseZero()));
   }
   private void phaseThree() {
-	  setPhase(Phase.level3(()->phaseZero(), ()->phaseEnd()));
+	  setPhase(Phase.level3(()->phaseEnd(), ()->phaseZero()));
   }
   void setPhase(Phase p){
     //set up the viewport and the timer
@@ -98,7 +98,7 @@ class Compact extends JFrame{
 class KeyButton extends JButton{
 	
 	private static final long serialVersionUID = 1L;
-	public static final List<Character> keys = new ArrayList<>(List.of('w','a','s','d','o','p'));
+	//public static final List<Character> keys = new ArrayList<>(List.of('w','a','s','d','o','p'));
 	public String key, act;
 	KeyButton(String key, String act){
 		super(act + ": " +key, null);
@@ -129,6 +129,7 @@ class KeyBindDisplay extends JPanel{
 		super(new GridLayout(3, 2, 5, 5));
 		setKeys.forEach(key->{
 			key.addActionListener(e->{
+				char old = key.key.charAt(0);
 				String newKey = key.key;
 				List<String> strCheck = setKeys.stream().map(KeyButton::key).toList();
 				while(strCheck.contains(newKey)||newKey.length()>1||newKey.isEmpty()) {
@@ -137,9 +138,11 @@ class KeyBindDisplay extends JPanel{
 				}
 				key.updateKey(newKey);
 				key.setText(key.act + ": " +newKey);
-				var cur = KeyButton.frame.currentPhase.controller();
+				Controller.keys.set(Controller.keys.indexOf(old), newKey.charAt(0));
 				//issue updating key bind
+				//var cur = KeyButton.frame.currentPhase.controller();
 				//cur.setAction(KeyEvent.getExtendedKeyCodeForChar(newKey.charAt(0)),KeyButton.frame.currentPhase.model().camera().set((Direction::up)) , KeyButton.frame.currentPhase.model().camera().set((Direction::unUp)));
+				
 			});
 			this.add(key);
 		});
