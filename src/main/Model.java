@@ -9,10 +9,10 @@ public interface Model{
   Cells cells();
   void onGameOver();
   void onNextLevel();
-
+  List<Monster> dead();
   default void ping(){
     entities().forEach(e->e.ping(this));
-    var end = entities().stream().noneMatch(e->e instanceof Monster);
+    var end = entities().stream().noneMatch(e->e instanceof Monster)&& dead().isEmpty();
     if (end){ onNextLevel(); }
     }
   }

@@ -63,13 +63,13 @@ class Compact extends JFrame{
 	  
   }
   private void phaseOne(){
-    setPhase(Phase.level1(()->phaseTwo(), ()->phaseZero()));
+    setPhase(Phase.level(()->phaseTwo(), ()->phaseZero(), List.of(new Monster(new Point(0, 0)))));
   }
   private void phaseTwo() {
-	  setPhase(Phase.level2(()->phaseThree(), ()->phaseZero()));
+	  setPhase(Phase.level(()->phaseThree(), ()->phaseZero(), List.of(new Monster(new Point(0, 0), "roam"), new Monster(new Point(13,13)), new Monster(new Point(0,13)), new Monster(new Point(13,0)))));
   }
   private void phaseThree() {
-	  setPhase(Phase.level3(()->phaseEnd(), ()->phaseZero()));
+	  setPhase(Phase.level(()->phaseEnd(), ()->phaseZero(), List.of(new Monster(new Point(0, 0), "boss"))));
   }
   void setPhase(Phase p){
     //set up the viewport and the timer

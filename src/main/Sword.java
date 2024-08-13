@@ -14,8 +14,12 @@ class Sword extends ControllableDirection implements Entity{
     var dir= new Point(Math.sin(weaponRadiant), Math.cos(weaponRadiant));
     return dir.times(distance()).add(wielder.location());
   }
+  
+  
   public void onHit(Model m, Entity e){
-    if (e instanceof Monster){ m.remove(e); }
+    if (e instanceof Monster){ 
+    	m.remove(e); 
+    }
   }
 
   public double effectRange(){ return 0.3d; }

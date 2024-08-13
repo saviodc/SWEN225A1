@@ -1,20 +1,26 @@
 package main;
 
+import java.util.ArrayList;
 import java.util.List;
 
 record Phase(Model model, Controller controller){ 
-  static Phase level1(Runnable next, Runnable first) {
+  static Phase level(Runnable next, Runnable first, List<Entity> Mons) {
     Camera c= new Camera(new Point(5, 5));
     Sword s= new Sword(c);
     Cells cells= new Cells();
+    List<Entity> allEntities= new ArrayList<Entity>(List.of(c, s));
+    allEntities.addAll(Mons);
     var m= new Model(){
-      List<Entity> entities= List.of(c, s, new Monster(new Point(0, 0)));
+      List<Entity> entities= allEntities;
+      List<Monster> dead = new ArrayList<>();
       public Camera camera(){ return c; }
+      public List<Monster> dead(){return dead;}
       public List<Entity> entities(){ return entities; }
       public void remove(Entity e){ 
         entities= entities.stream()
           .filter(ei->!ei.equals(e))
           .toList();
+        
       }
       public Cells cells(){ return cells; }
       public void onGameOver(){ first.run(); }
@@ -22,43 +28,4 @@ record Phase(Model model, Controller controller){
     };
     return new Phase(m, new Controller(c, s));    
   }
-  static Phase level2(Runnable next, Runnable first) {
-	    Camera c= new Camera(new Point(5, 5));
-	    Sword s= new Sword(c);
-	    Cells cells= new Cells();
-	    var m= new Model(){
-	      List<Entity> entities= List.of(c, s, new Monster(new Point(0, 0), "roam"), new Monster(new Point(13,13)), new Monster(new Point(0,13)), new Monster(new Point(13,0)));
-	      public Camera camera(){ return c; }
-	      public List<Entity> entities(){ return entities; }
-	      public void remove(Entity e){ 
-	        entities= entities.stream()
-	          .filter(ei->!ei.equals(e))
-	          .toList();
-	      }
-	      public Cells cells(){ return cells; }
-	      public void onGameOver(){ first.run(); }
-	      public void onNextLevel(){ next.run(); }
-	    };
-	    return new Phase(m, new Controller(c, s));    
-	  }
-  static Phase level3(Runnable next, Runnable first) {
-	    Camera c= new Camera(new Point(5, 5));
-	    Sword s= new Sword(c);
-	    Cells cells= new Cells();
-	    var m= new Model(){
-	      List<Entity> entities= List.of(c, s, new Monster(new Point(0, 0), "boss"));
-	      public Camera camera(){ return c; }
-	      public List<Entity> entities(){ return entities; }
-	      public void remove(Entity e){ 
-	    	  
-	        entities= entities.stream()
-	          .filter(ei->!ei.equals(e))
-	          .toList();
-	      }
-	      public Cells cells(){ return cells; }
-	      public void onGameOver(){ first.run(); }
-	      public void onNextLevel(){ next.run(); }
-	    };
-	    return new Phase(m, new Controller(c, s));    
-	  }
 }
