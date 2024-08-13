@@ -127,7 +127,6 @@ enum MonsterStates implements MonsterState{
 			assert m.state==this;
 			sword = new Sword(m) {
 				public void onHit(Model m, Entity e){
-					System.out.println("out");
 				    if (e instanceof Camera){ m.remove(e); }
 				    m.onGameOver();
 				  }

@@ -132,17 +132,13 @@ class KeyBindDisplay extends JPanel{
 				char old = key.key.charAt(0);
 				String newKey = key.key;
 				List<String> strCheck = setKeys.stream().map(KeyButton::key).toList();
-				while(strCheck.contains(newKey)||newKey.length()>1||newKey.isEmpty()) {
+				while(newKey.length()>1||newKey.isEmpty()||strCheck.contains(newKey)) {
 					newKey = JOptionPane.showInputDialog(KeyButton.frame,"New Key for "+ key.act +": ", "Input single char", JOptionPane.QUESTION_MESSAGE);
 					if(newKey == null)return;
 				}
 				key.updateKey(newKey);
 				key.setText(key.act + ": " +newKey);
-				Controller.keys.set(Controller.keys.indexOf(old), newKey.charAt(0));
-				//issue updating key bind
-				//var cur = KeyButton.frame.currentPhase.controller();
-				//cur.setAction(KeyEvent.getExtendedKeyCodeForChar(newKey.charAt(0)),KeyButton.frame.currentPhase.model().camera().set((Direction::up)) , KeyButton.frame.currentPhase.model().camera().set((Direction::unUp)));
-				
+				Controller.keys.set(Controller.keys.indexOf(old), newKey.charAt(0)); 
 			});
 			this.add(key);
 		});
