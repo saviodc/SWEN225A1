@@ -5,7 +5,6 @@ enum Direction{
   Up(0d, -1d){ 
     Direction right(){ return UpRight; }
     Direction left(){ return UpLeft; }
-    @Override
     Direction unUp(){ return None; }
   },
   UpRight(+0.7071d, -0.7071d){

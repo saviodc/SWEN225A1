@@ -7,53 +7,29 @@ import imgs.Img;
 
 class MonsterException extends Error{
 	private static final long serialVersionUID = 1L;
-	public MonsterException() {
-        super("Dead Monster");
-    }
+	
 	public MonsterException(String message) {
         super(message);
     }
 }
-interface MonsterState{
-	 default Point location(Monster mon) {
-		 return mon.location();
-	 }
-	 
-	 void ping(Model m, Monster mon);
-	 double chaseTarget(Monster outer, Point target, Monster mon);
-	 default void draw(Graphics g, Point center, Dimension size, Monster mon) {
-			mon.drawImg(Img.AwakeMonster.image, g, center, size);
-	}
-}
-enum MonsterStates implements MonsterState{
+
+enum MonsterStates{
 	Awake(){
 		public void ping(Model m, Monster mon) {
-			var arrow = m.camera().location().distance(mon.location());
-			double size = arrow.size();
+			double size = chaseTarget(mon, m.camera().location());
 			if(size>6) {mon.state = Sleep;return;}
-			arrow = arrow.times(mon.speed() / size);
-			mon.location(mon.location().add(arrow));
 			if (size < 0.6d) {
 				mon.state = Dead;
 				m.onGameOver();
 			}
-		}
-		public double chaseTarget(Monster outer, Point target, Monster mon) {
-			var arrow = target.distance(outer.location());
-			double size = arrow.size();
-			arrow = arrow.times(mon.speed() / size);
-			outer.location(outer.location().add(arrow));
-			return size;
-		}
-		
-		
+		}	
 	},
 	Dead(){
 		public void ping(Model m, Monster mon) {
-			
+			mon.updateDeath();
 		}
-		public  double chaseTarget(Monster outer, Point target, Monster mon) {
-			 throw new MonsterException();
+		public  double chaseTarget(Monster outer, Point target) {
+			 throw new MonsterException("Dead Monster Chasing Call");
 		 }
 		public  void draw(Graphics g, Point center, Dimension size, Monster mon) {
 			 mon.drawImg(Img.DeadMonster.image, g, center, size);
@@ -66,85 +42,66 @@ enum MonsterStates implements MonsterState{
 			double size = arrow.size();
 			if(size <6d)mon.state = Awake;
 		}
-		public  double chaseTarget(Monster outer, Point target, Monster mon) {
-			 return 0;
-		 }
+
 		public  void draw(Graphics g, Point center, Dimension size, Monster mon) {
 			 mon.drawImg(Img.SleepMonster.image, g, center, size);
 		 }
 		
 	}, 
 	Roaming(){
-		Point goal = new Point(Math.random()*16, Math.random()*16);
-		int progress = 0;
 		public void ping(Model m, Monster mon) {
-			var arrow = goal.distance(mon.location());;
-			double toGoal = arrow.size();
-			arrow = arrow.times(mon.speed() / toGoal);
-			mon.location(mon.location().add(arrow));
-			double toPlayer = m.camera().location().distance(mon.location()).size();
-			if (toPlayer < 0.6d) {
-				m.onGameOver();
-				mon.state = Dead;
-			}
-			if(progress++ == 50 || toGoal < 0.6d) {
-				goal = new Point(Math.random()*16, Math.random()*16);
-				progress = 0;
+			if (mon instanceof RoamingMonster roamingMon) {
+				double size = chaseTarget(mon,roamingMon.goal);
+				double toPlayer = m.camera().location().distance(mon.location()).size();
+				if (toPlayer < 0.6d) {
+					m.onGameOver();
+					mon.state = Dead;
+				}
+				roamingMon.checkProgress(size);
+			}else {
+				throw new MonsterException("Calling on Boss error");
 			}
 		}
-		public double chaseTarget(Monster outer, Point target, Monster mon) {
-			var arrow = target.distance(outer.location());
-			double size = arrow.size();
-			arrow = arrow.times(mon.speed() / size);
-			outer.location(outer.location().add(arrow));
-			return size;
-		}
-		
 	}, 
 	Boss(){
-		Sword sword;
 		public void ping(Model m, Monster mon) {
-			var arrow = m.camera().location().distance(mon.location());
-			double size = arrow.size();
-			//if(size>6) {mon.state = Sleep;return;}
-			arrow = arrow.times(mon.speed() / size);
-			mon.location(mon.location().add(arrow));
-			sword.ping(m);
-			if (size < 0.6d) {
-				mon.state = Dead;
-				m.onGameOver();
+			if (mon instanceof BossMonster bossMon) {
+				double size = chaseTarget(mon, m.camera().location());
+				bossMon.sword().ping(m);
+				if (size < 0.6d) {
+					mon.state = Dead;
+					m.onGameOver();
+				}
+			}else {
+				throw new MonsterException("Calling on Boss error");
 			}
 		}
-		public double chaseTarget(Monster outer, Point target, Monster mon) {
-			var arrow = target.distance(outer.location());
-			double size = arrow.size();
-			arrow = arrow.times(mon.speed() / size);
-			outer.location(outer.location().add(arrow));
-			return size;
-		}
-		@Override
-		public void assignSword(Monster m) {
-			assert m.state==this;
-			sword = new Sword(m) {
-				public void onHit(Model m, Entity e){
-				    if (e instanceof Camera){ m.remove(e); }
-				    m.onGameOver();
-				  }
-				public double speed(){ return 0.4d; }
-				public double distance(){ return 1.5d; }
-				
-			};
-			sword.direction(Direction.Left);
-		}
+
 		public void draw(Graphics g, Point center, Dimension size, Monster mon) {
-			sword.draw(g, center,size);
-			//sword.drawImg(Img.Sword.image, g, center, size);
-			mon.drawImg(Img.AwakeMonster.image, g, center, size);
+			if (mon instanceof BossMonster bossMon) {
+				bossMon.sword().draw(g, center,size);
+				mon.drawImg(Img.AwakeMonster.image, g, center, size);
+			}else {
+				throw new MonsterException("Calling on Boss error");
+			}
 	}
 	};
-
-	void assignSword(Monster monster) {throw new MonsterException("This Monster cannot weild sword");}
-
+	 Point location(Monster mon) {
+		 return mon.location();
+	 }
+	 
+	 abstract void ping(Model m, Monster mon);
+	  void draw(Graphics g, Point center, Dimension size, Monster mon) {
+			mon.drawImg(Img.AwakeMonster.image, g, center, size);
+	}
+	 public double chaseTarget(Monster outer, Point target) {
+			var arrow = target.distance(outer.location());
+			double size = arrow.size();
+			arrow = arrow.times(outer.speed() / size);
+			outer.location(outer.location().add(arrow));
+			return size;
+	}
+	
 }
 
 class Monster implements Entity {
@@ -155,17 +112,6 @@ class Monster implements Entity {
 		this.location = location;
 	}
 	
-	Monster(Point location, String s) {
-		this.location = location;
-		if(s.equals("roam")) {
-			state = MonsterStates.Roaming;
-		}else if (s.equals("boss")){
-			state = MonsterStates.Boss;
-			MonsterStates.Boss.assignSword(this);
-		}else {
-			throw new MonsterException();
-		}
-	}
 	
 	public double speed() {
 		return 0.05d;
@@ -183,11 +129,65 @@ class Monster implements Entity {
 		state.ping(m, this);
 	}
 
-	public double chaseTarget(Monster outer, Point target) {
-		return state.chaseTarget(outer, target, this);
-	}
+	
 
 	public void draw(Graphics g, Point center, Dimension size) {
 		state.draw(g, center, size, this);
 	}
+
+
+	public boolean pingedOut() {
+		assert state == MonsterStates.Dead;		
+		return onceDead >=100;
+	}
+
+
+	void updateDeath() {
+		assert state == MonsterStates.Dead;
+		onceDead++;
+		
+	}
 }
+
+
+
+class RoamingMonster extends Monster{
+	private int progress = 0;
+	public Point goal = new Point(Math.random()*16, Math.random()*16);
+	RoamingMonster(Point location){
+		super(location);
+		super.state = MonsterStates.Roaming;
+	}
+	public void checkProgress(double size ) {
+		if(progress++ >= 50 || size < 0.6d) {
+			goal = new Point(Math.random()*16, Math.random()*16);
+			progress = 0;
+		}
+	}
+}
+
+class BossMonster extends Monster{
+	Sword sword;
+	BossMonster(Point location) {
+		super(location);
+		super.state = MonsterStates.Boss;
+		assignSword();
+	}
+
+	private void assignSword() {
+		 sword = new Sword(this) {
+			public void onHit(Model m, Entity e){
+			    if (e instanceof Camera){ m.remove(e); }
+			    m.onGameOver();
+			  }
+			public double speed(){ return 0.4d; }
+			public double distance(){ return 1.5d; }
+			
+		};
+		sword.direction(Direction.Left);
+	}
+	public Sword sword() {
+		return sword;
+	}
+}
+

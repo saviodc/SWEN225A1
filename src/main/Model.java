@@ -1,7 +1,6 @@
 package main;
 
 import java.util.List;
-import java.util.Map;
 
 public interface Model{
   Camera camera();
@@ -10,13 +9,11 @@ public interface Model{
   Cells cells();
   void onGameOver();
   void onNextLevel();
-  Map<Monster, Integer> dead();
-  void filterDead();
+   void filterDead();
   default void ping(){
     entities().forEach(e->e.ping(this));
-    dead().entrySet().forEach(e->e.setValue(e.getValue()+1));
     filterDead();
-    var end = entities().stream().noneMatch(e->e instanceof Monster)&& dead().isEmpty();
+    var end = entities().stream().noneMatch(e->e instanceof Monster);    
     if (end){ onNextLevel(); }
     }
   }

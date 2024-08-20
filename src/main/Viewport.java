@@ -23,7 +23,6 @@ class Viewport extends JPanel{
     //Note: may need more then 10 if you have very high screen resolution
     model.cells().forAll(center().toCoord(), 10, cell->cell.draw(g, c, s));
     model.entities().forEach(e->e.draw(g, c, s));
-    model.dead().keySet().forEach(e->e.draw(g, c, s));
   }
   Model model;
   Keys keys= new Keys();

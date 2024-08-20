@@ -17,9 +17,7 @@ class Sword extends ControllableDirection implements Entity{
   
   
   public void onHit(Model m, Entity e){
-    if (e instanceof Monster){ 
-    	m.remove(e); 
-    }
+    if (e instanceof Monster){ m.remove(e); }
   }
 
   public double effectRange(){ return 0.3d; }

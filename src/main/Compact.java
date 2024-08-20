@@ -66,10 +66,10 @@ class Compact extends JFrame{
 	  setPhase(Phase.level(()->phaseTwo(), ()->phaseZero(), List.of(new Monster(new Point(0, 0)))));
   }
   private void phaseTwo() {
-	  setPhase(Phase.level(()->phaseThree(), ()->phaseZero(), List.of(new Monster(new Point(0, 0), "roam"), new Monster(new Point(13,13)), new Monster(new Point(0,13)), new Monster(new Point(13,0)))));
+	  setPhase(Phase.level(()->phaseThree(), ()->phaseZero(), List.of(new RoamingMonster(new Point(0, 0)), new Monster(new Point(13,13)), new Monster(new Point(0,13)), new Monster(new Point(13,0)))));
   }
   private void phaseThree() {
-	  setPhase(Phase.level(()->phaseEnd(), ()->phaseZero(), List.of(new Monster(new Point(0, 0), "boss"))));
+	  setPhase(Phase.level(()->phaseEnd(), ()->phaseZero(), List.of(new BossMonster(new Point(0, 0)))));
   }
   void setPhase(Phase p){
     //set up the viewport and the timer
@@ -114,31 +114,29 @@ class KeyButton extends JButton{
 	boolean matches(String s) {
 		return s.equals(key);
 	}
+	
 	String key() {return key;}
 	
 }
 
 @SuppressWarnings("serial")
 class KeyBindDisplay extends JPanel{
-	public static final List<KeyButton> setKeys; 
-	static {
-		setKeys = new ArrayList<>(List.of(new KeyButton("w", "Up"), new KeyButton("a", "Left"),new KeyButton("s", "Down"),new KeyButton("d", "Right"),new KeyButton("o", "Sword Left"),new KeyButton("p", "Sword Right")));
-		
-	}
+	public static final List<KeyButton> setKeys = new ArrayList<>(List.of(new KeyButton("w", "Up"), new KeyButton("a", "Left"),new KeyButton("s", "Down"),new KeyButton("d", "Right"),new KeyButton("o", "Sword Left"),new KeyButton("p", "Sword Right")));
+	
 	KeyBindDisplay(){
 		super(new GridLayout(3, 2, 5, 5));
 		setKeys.forEach(key->{
 			key.addActionListener(e->{
-				char old = key.key.charAt(0);
+				char oldKey = key.key.charAt(0);
 				String newKey = key.key;
 				List<String> strCheck = setKeys.stream().map(KeyButton::key).toList();
-				while(newKey.length()>1||newKey.isEmpty()||strCheck.contains(newKey)) {
+				while(newKey.length()!=1||strCheck.contains(newKey)) {
 					newKey = JOptionPane.showInputDialog(KeyButton.frame,"New Key for "+ key.act +": ", "Input single char", JOptionPane.QUESTION_MESSAGE);
-					if(newKey == null)return;
+					if(newKey == null)return;//if player clicks cancel, do not change keybind.
 				}
 				key.updateKey(newKey);
 				key.setText(key.act + ": " +newKey);
-				Controller.keys.set(Controller.keys.indexOf(old), newKey.charAt(0)); 
+				Controller.keys.set(Controller.keys.indexOf(oldKey), newKey.charAt(0)); 
 			});
 			this.add(key);
 		});

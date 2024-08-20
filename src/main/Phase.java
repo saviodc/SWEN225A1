@@ -1,10 +1,9 @@
 package main;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
+
 
 record Phase(Model model, Controller controller){ 
   static Phase level(Runnable next, Runnable first, List<Entity> Mons) {
@@ -15,25 +14,24 @@ record Phase(Model model, Controller controller){
     allEntities.addAll(Mons);
     var m= new Model(){
       List<Entity> entities= allEntities;
-      Map<Monster, Integer> dead = new HashMap<>();
       public Camera camera(){ return c; }
-      public Map<Monster, Integer> dead(){return dead;}
       public List<Entity> entities(){ return entities; }
       public void remove(Entity e){ 
-        entities= entities.stream()
+    	  if(e instanceof Monster) {
+    		  entities.stream().filter(en->en.equals(e)).map(mon->(Monster)mon).forEach(m->m.state=MonsterStates.Dead);
+    	  }else {
+       entities.stream()
           .filter(ei->!ei.equals(e))
           .toList();
-        if(e instanceof Monster mon) {
-        	mon.state = MonsterStates.Dead;
-        	dead.put(mon, 0);
-        }
+    	 }
       }
       public Cells cells(){ return cells; }
       public void onGameOver(){ first.run(); }
       public void onNextLevel(){ next.run(); }
       public void filterDead() {
-    	  dead = dead.entrySet().stream().filter(e->e.getValue()<100).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-      }
+   	   entities.removeAll(entities.stream().filter(e->e instanceof Monster).map(m->(Monster) m).filter(m->m.state==MonsterStates.Dead).filter(m->m.pingedOut()).toList());
+     }
+      
     };
     return new Phase(m, new Controller(c, s));    
   }
