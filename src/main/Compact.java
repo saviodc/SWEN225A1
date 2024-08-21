@@ -98,7 +98,6 @@ class Compact extends JFrame{
 class KeyButton extends JButton{
 	
 	private static final long serialVersionUID = 1L;
-	//public static final List<Character> keys = new ArrayList<>(List.of('w','a','s','d','o','p'));
 	public String key, act;
 	KeyButton(String key, String act){
 		super(act + ": " +key, null);

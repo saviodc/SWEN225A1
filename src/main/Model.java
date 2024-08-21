@@ -9,7 +9,7 @@ public interface Model{
   Cells cells();
   void onGameOver();
   void onNextLevel();
-   void filterDead();
+  void filterDead();//read explanation in Phase for method justification.
   default void ping(){
     entities().forEach(e->e.ping(this));
     filterDead();

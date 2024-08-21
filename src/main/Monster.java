@@ -59,19 +59,15 @@ enum MonsterStates{
 				}
 				roamingMon.checkProgress(size);
 			}else {
-				throw new MonsterException("Calling on Boss error");
+				throw new MonsterException("Calling on Roam error");
 			}
 		}
 	}, 
 	Boss(){
 		public void ping(Model m, Monster mon) {
 			if (mon instanceof BossMonster bossMon) {
-				double size = chaseTarget(mon, m.camera().location());
 				bossMon.sword().ping(m);
-				if (size < 0.6d) {
-					mon.state = Dead;
-					m.onGameOver();
-				}
+				Roaming.ping(m, mon);
 			}else {
 				throw new MonsterException("Calling on Boss error");
 			}
@@ -149,8 +145,6 @@ class Monster implements Entity {
 	}
 }
 
-
-
 class RoamingMonster extends Monster{
 	private int progress = 0;
 	public Point goal = new Point(Math.random()*16, Math.random()*16);
@@ -165,8 +159,7 @@ class RoamingMonster extends Monster{
 		}
 	}
 }
-
-class BossMonster extends Monster{
+class BossMonster extends RoamingMonster{
 	Sword sword;
 	BossMonster(Point location) {
 		super(location);
@@ -190,4 +183,3 @@ class BossMonster extends Monster{
 		return sword;
 	}
 }
-
