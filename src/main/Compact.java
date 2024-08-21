@@ -50,6 +50,10 @@ class Compact extends JFrame{
     pack();
   }
   
+  /**
+   * Simple closing page with message and closing button.
+   * 
+   */
   private void phaseEnd() {
 	  var message = new JLabel("Congratulations");
 	  var close = new JButton("Close");
@@ -62,6 +66,10 @@ class Compact extends JFrame{
 	  pack();
 	  
   }
+  
+  /**
+   * Kept each phase as its own method instead of abstracting away the set phase for simpler/easier transition code.
+   */
   private void phaseOne(){
 	  setPhase(Phase.level(()->phaseTwo(), ()->phaseZero(), List.of(new Monster(new Point(0, 0)))));
   }
@@ -110,17 +118,20 @@ class KeyButton extends JButton{
 		this.key = key;
 	}
 	
-	boolean matches(String s) {
-		return s.equals(key);
-	}
-	
 	String key() {return key;}
 	
 }
 
+/**
+ * Panel to display all the key bind buttons
+ * On creation runs through each of the keys.
+ */
 @SuppressWarnings("serial")
 class KeyBindDisplay extends JPanel{
+	//static as to save even after death and linked to Controller
 	public static final List<KeyButton> setKeys = new ArrayList<>(List.of(new KeyButton("w", "Up"), new KeyButton("a", "Left"),new KeyButton("s", "Down"),new KeyButton("d", "Right"),new KeyButton("o", "Sword Left"),new KeyButton("p", "Sword Right")));
+	
+
 	
 	KeyBindDisplay(){
 		super(new GridLayout(3, 2, 5, 5));
@@ -130,7 +141,7 @@ class KeyBindDisplay extends JPanel{
 				String newKey = key.key;
 				List<String> strCheck = setKeys.stream().map(KeyButton::key).toList();
 				while(newKey.length()!=1||strCheck.contains(newKey)) {
-					newKey = JOptionPane.showInputDialog(KeyButton.frame,"New Key for "+ key.act +": ", "Input single char", JOptionPane.QUESTION_MESSAGE);
+					newKey = JOptionPane.showInputDialog(KeyButton.frame,"New Key for "+ key.act +": ", "Input single char, click ", JOptionPane.QUESTION_MESSAGE);
 					if(newKey == null)return;//if player clicks cancel, do not change keybind.
 				}
 				key.updateKey(newKey);

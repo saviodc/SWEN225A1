@@ -13,6 +13,9 @@ class MonsterException extends Error{
     }
 }
 
+/**
+ * Collection of all monster states
+ */
 enum MonsterStates{
 	Awake(){
 		public void ping(Model m, Monster mon) {
@@ -82,14 +85,14 @@ enum MonsterStates{
 			}
 	}
 	};
-	 Point location(Monster mon) {
-		 return mon.location();
-	 }
-	 
+
 	 abstract void ping(Model m, Monster mon);
-	  void draw(Graphics g, Point center, Dimension size, Monster mon) {
+	 void draw(Graphics g, Point center, Dimension size, Monster mon) {
 			mon.drawImg(Img.AwakeMonster.image, g, center, size);
 	}
+	  /**
+	   * Abstracted out Monster chasing movement
+	   */
 	 public double chaseTarget(Monster outer, Point target) {
 			var arrow = target.distance(outer.location());
 			double size = arrow.size();
@@ -101,6 +104,7 @@ enum MonsterStates{
 }
 
 class Monster implements Entity {
+	//dead monster field, any Monster can be dead
 	int onceDead = 0;
 	MonsterStates state = MonsterStates.Sleep;
 	private Point location;
@@ -137,14 +141,18 @@ class Monster implements Entity {
 		return onceDead >=100;
 	}
 
-
 	void updateDeath() {
 		assert state == MonsterStates.Dead;
 		onceDead++;
-		
 	}
 }
 
+/**
+ * Motivation for a specific class, on top of state pattern is internal state.
+ * I couldve and did have a far more compact example with just the fields belonging to the enum.
+ * This worked as there was only one instance of this Monster. However, that is not good code
+ * This solution is more modular and works for further extensions of the game.
+ */
 class RoamingMonster extends Monster{
 	private int progress = 0;
 	public Point goal = new Point(Math.random()*16, Math.random()*16);
@@ -159,6 +167,10 @@ class RoamingMonster extends Monster{
 		}
 	}
 }
+
+/**
+ * Read above explanation for extension of Monster.
+ */
 class BossMonster extends RoamingMonster{
 	Sword sword;
 	BossMonster(Point location) {

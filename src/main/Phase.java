@@ -32,12 +32,12 @@ record Phase(Model model, Controller controller){
        */
       public void remove(Entity e){ 
     	  if(e instanceof Monster) {
-    		  entities.stream().filter(en->en.equals(e)).map(mon->(Monster)mon).forEach(m->m.state=MonsterStates.Dead);
+    		  entities.stream().filter(en->en.equals(e)).map(mon->(Monster)mon).forEach(m->m.state=MonsterStates.Dead);//just changes state if to remove a monster
     	  }else {
-       entities.stream()
-          .filter(ei->!ei.equals(e))
-          .toList();
-    	 }
+	       entities =entities.stream()
+	          .filter(ei->!ei.equals(e))
+	          .toList();
+    	  }
       }
       public Cells cells(){ return cells; }
       public void onGameOver(){ first.run(); }

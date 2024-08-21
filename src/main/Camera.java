@@ -13,6 +13,7 @@ class Camera extends ControllableDirection implements Entity{
   public void ping(Model m) {
     location(location().add(arrow()));
   }
+  
   public void draw(Graphics g, Point center, Dimension size){
     drawImg(Img.Hero.image, g, center, size);
     }
